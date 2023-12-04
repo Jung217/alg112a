@@ -1,6 +1,7 @@
 ## 習題
 ### 習題一
-寫出費氏數列的迴圈版
+> 寫出費氏數列的迴圈版
+
 ```python
 fib = [None]*1000
 fib[0] = fib[1] = 1
@@ -23,10 +24,56 @@ Enter n : 60
 fibonacci(60) = 1548008755920
 ```
 ### 習題二
+> 完成這個程式未寫的部分（記得加上測試程式）
+
+```python
+# 方法 1
+def power2n_0(n):
+    return 2**n
+
+# 方法 2a：用遞迴
+def power2n_1(n):
+    if n==0 or n==1: return n+1
+    return power2n_1(n-1)+power2n_1(n-1)
+
+# 方法 2b：用遞迴
+def power2n_2(n):
+    if n==0 or n==1: return n+1
+    return 2*power2n_2(n-1)
+
+# 方法 3：用遞迴+查表
+def power2n_3(n):
+    pow2 = [None]*1000
+    pow2[0] = 1
+    pow2[1] = 2
+    if pow2[n] == None: return power2n_3(n-1)+power2n_3(n-1)
+    else: return pow2[n]
+
+n = int(input('Enter n : '))
+print(f'power2n_0({n}) = {power2n_0(n)}')
+print(f'power2n_1({n}) = {power2n_1(n)}')
+print(f'power2n_2({n}) = {power2n_2(n)}')
+print(f'power2n_3({n}) = {power2n_3(n)}')
+```
+```
+PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題2> python .\power2n.py
+Enter n : 3
+power2n_0(3) = 8
+power2n_1(3) = 8
+power2n_2(3) = 8
+power2n_3(3) = 8
+PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題2> python .\power2n.py
+Enter n : 16
+power2n_0(16) = 65536
+power2n_1(16) = 65536
+power2n_2(16) = 65536
+power2n_3(16) = 65536
+```
 ### 習題三
 ### 習題四 : 求解方程式
 > 求解方程式 x^2 - 3x + 1 = 0
 > 暴力法、迭代法（至少寫三個迭代式，其中至少有一個收斂）
+
 * 暴力法
     ```python
     # x^2 - 3x + 1 = 0
