@@ -1,4 +1,5 @@
 ## 習題
+> 未標註為原創，參考均標於程式中
 ### 習題一
 > 寫出費氏數列的迴圈版
 
@@ -71,10 +72,55 @@ power2n_3(16) = 65536
 ```
 ### 習題三
 > 寫出可以列舉所有排列的程式
-```python
 
+```python
+# 參考老師上課範例
+def permutation(n):
+    p = []
+    return permNext(n, p)
+
+def permNext(n, p):
+    if len(p) == n:
+        print(p)
+        return
+    for x in range(n):
+        if x not in p:
+            p.append(x)
+            permNext(n, p)
+            p.pop()
+
+permutation(3)
 ```
 ```
+PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題3> python .\permutation.py
+[0, 1, 2]
+[0, 2, 1]
+[1, 0, 2]
+[1, 2, 0]
+[2, 0, 1]
+[2, 1, 0]
+```
+```python
+def truthtable(n, Curtable=[]):
+    if n == 0:
+        print(Curtable) 
+    else:
+        for value in [0, 1]:
+            #print(Curtable)
+            truthtable(n - 1, Curtable + [value])
+
+truthtable(3)
+```
+```
+PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題3> python .\truthtable.py
+[0, 0, 0]
+[0, 0, 1]
+[0, 1, 0]
+[0, 1, 1]
+[1, 0, 0]
+[1, 0, 1]
+[1, 1, 0]
+[1, 1, 1]
 ```
 ### 習題四 : 求解方程式
 > 求解方程式 x^2 - 3x + 1 = 0
@@ -146,6 +192,7 @@ power2n_3(16) = 65536
 > 請寫一個爬山演算法程式可以找任何向量函數的最高點
 
 ```python
+# 參考老師上課範例
 import random
 
 def hillClimbing(f, p, h=0.01):
@@ -193,6 +240,62 @@ p= [6.753990180640313e-05, 0.00020746960649199644, -2.5881103985881705e-05] f(p)
 ([6.753990180640313e-05, 0.00020746960649199644, -2.5881103985881705e-05], -4.8275107497490447e-08)
 ```
 ### 習題六
+>
+
+```python
+# 參考老師上課範例
+import numpy as np
+from numpy.linalg import norm
+
+# 偏微分
+def df(f, p, k ,step=0.01):
+    p1 = p.copy()
+    p1[k] = p[k]+step
+    return (f(p1) - f(p)) / step
+
+# 梯度
+def grad(f, p):
+    gp = p.copy()
+    for k in range(len(p)):
+        gp[k] = df(f, p, k)
+    return gp
+
+# 梯度下降
+def gradDescendent(f, p0, step=0.01, max=100000, dp=10):
+    p = p0.copy()
+    fp0 = f(p)
+    for i in range(max):
+        fp = f(p)
+        gp = grad(f, p) 
+        glen = norm(gp) 
+        if i % dp == 0: 
+            print('{:05d}:f(p)={:.3f} p={:s} gp={:s} glen={:.5f}'.format(i, fp, str(p), str(gp), glen))
+        if glen < 0.00001:
+            break
+        gstep = np.multiply(gp, -1*step) 
+        p +=  gstep 
+        fp0 = fp
+    print('\n{:05d}:f(p)={:.3f} p={:s} gp={:s} glen={:.5f}\n'.format(i, fp, str(p), str(gp), glen))
+    return p
+
+def f(p):
+    [x, y, z] = p
+    return (x-5)**2+(y-1)**2+(z-3)**2
+
+gradDescendent(f, [0.0, 0.0, 0.0])
+```
+```
+00000:f(p)=35.000 p=[0.0, 0.0, 0.0] gp=[-9.98999999999981, -1.9899999999999807, -5.989999999999895] glen=11.81695
+00010:f(p)=23.380 p=[0.91372133 0.18201256 0.54786694] gp=[-8.16255734 -1.62597489 -4.89426611] glen=9.65531
+00020:f(p)=15.619 p=[1.66029818 0.33073007 0.99551412] gp=[-6.66940364 -1.32853986 -3.99897175] glen=7.88909
+00030:f(p)=10.437 p=[2.27030582 0.4522431  1.36127446] gp=[-5.44938835 -1.0855138  -3.26745107] glen=6.44596
+......
+00670:f(p)=0.000 p=[4.99499339 0.99499868 2.99499604] gp=[-1.32140578e-05 -2.63222973e-06 -7.92314377e-06] glen=0.00002
+00680:f(p)=0.000 p=[4.9949946  0.99499892 2.99499676] gp=[-1.07968473e-05 -2.15072334e-06 -6.47378532e-06] glen=0.00001
+00690:f(p)=0.000 p=[4.99499559 0.99499912 2.99499736] gp=[-8.82181032e-06 -1.75729755e-06 -5.28955394e-06] glen=0.00001
+
+00693:f(p)=0.000 p=[4.99499585 0.99499917 2.99499751] gp=[-8.30301730e-06 -1.65395440e-06 -4.97848585e-06] glen=0.00001
+```
 ### 習題七
 ### 習題八
 ### 習題九

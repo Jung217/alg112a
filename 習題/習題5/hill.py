@@ -1,4 +1,6 @@
+# 參考老師上課範例
 import random
+
 def hillClimbing(f, p, h=0.01):
     failCount = 0                      # 失敗次數歸零
     while (failCount < 10000):         # 如果失敗次數小於一萬次就繼續執行
@@ -11,7 +13,7 @@ def hillClimbing(f, p, h=0.01):
             failCount = 0              # 失敗次數歸零
         else:                          # 若沒有更高
             failCount = failCount + 1  # 那就又失敗一次
-    return (p, fnow)                    # 結束傳回 （已經失敗超過一萬次了）
+    return (p, fnow)                   # 結束傳回 （已經失敗超過一萬次了）
 
 def neighbor(f, p, h=0.01):
     p1 = p.copy()

@@ -1,3 +1,4 @@
+# 參考老師上課範例
 import numpy as np
 from numpy.linalg import norm
 

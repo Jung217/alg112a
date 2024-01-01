@@ -1,3 +1,4 @@
+# 參考老師上課範例
 def permutation(n):
     p = []
     return permNext(n, p)
