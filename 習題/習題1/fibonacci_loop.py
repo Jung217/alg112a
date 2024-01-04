@@ -1,3 +1,5 @@
+# 原創
+
 fib = [None]*1000
 fib[0] = fib[1] = 1
 n = int(input("Enter n : "))

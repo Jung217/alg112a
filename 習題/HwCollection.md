@@ -4,6 +4,8 @@
 > 寫出費氏數列的迴圈版
 
 ```python
+# 原創
+
 fib = [None]*1000
 fib[0] = fib[1] = 1
 n = int(input("Enter n : "))
@@ -28,6 +30,9 @@ fibonacci(60) = 1548008755920
 > 完成這個程式未寫的部分（記得加上測試程式）
 
 ```python
+# 方法3 參考 : https://github.com/ccc112a/py2cs/blob/master/02-%E6%BC%94%E7%AE%97%E6%B3%95/02-%E6%96%B9%E6%B3%95/01-%E6%9F%A5%E8%A1%A8%E6%B3%95/fiboanacci/fibonacci_lookup.py
+# 其餘原創
+
 # 方法 1
 def power2n_0(n):
     return 2**n
@@ -75,6 +80,7 @@ power2n_3(16) = 65536
 
 ```python
 # 參考老師上課範例
+
 def permutation(n):
     p = []
     return permNext(n, p)
@@ -101,12 +107,13 @@ PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題3> python .\permutation.py
 [2, 1, 0]
 ```
 ```python
+# 原創
+
 def truthtable(n, Curtable=[]):
     if n == 0:
         print(Curtable) 
     else:
         for value in [0, 1]:
-            #print(Curtable)
             truthtable(n - 1, Curtable + [value])
 
 truthtable(3)
@@ -128,12 +135,15 @@ PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題3> python .\truthtable.py
 
 * 暴力法
     ```python
+    # 參考老師上課範例
+
     # x^2 - 3x + 1 = 0
     from numpy import arange
     import math
 
     def f(x) :
         return x**2/3 - x + 1/3
+        #return math.sin(x*x+2*x)/x*x*x 
 
     for x in arange(-100, 100, 0.001):
         if abs(f(x)) < 0.001:
@@ -149,6 +159,8 @@ PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題3> python .\truthtable.py
     ```
 * 迭代法
     ```python
+    # f1-f3 原創 ， for 參考老師範例
+
     # x^2 - 3x + 1 = 0
 
     # x^2 = 3x -1 >>> x = 3 - 1/x
@@ -193,6 +205,7 @@ PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題3> python .\truthtable.py
 
 ```python
 # 參考老師上課範例
+
 import random
 
 def hillClimbing(f, p, h=0.01):
@@ -244,6 +257,7 @@ p= [6.753990180640313e-05, 0.00020746960649199644, -2.5881103985881705e-05] f(p)
 
 ```python
 # 參考老師上課範例
+
 import numpy as np
 from numpy.linalg import norm
 

@@ -1,4 +1,5 @@
 # 參考老師上課範例
+
 import random
 
 def hillClimbing(f, p, h=0.01):
