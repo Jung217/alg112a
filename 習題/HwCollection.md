@@ -313,6 +313,7 @@ PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題6> python .\grad.py
 ### 習題八
 > 請選一位圖靈獎得主，詳細說明他的得獎原因
 
+[HW8.md](https://github.com/Jung217/alg112a/blob/master/%E7%BF%92%E9%A1%8C/%E7%BF%92%E9%A1%8C8/HW8.md)
 ```
 # 提姆·柏內茲-李
 ## 2016圖靈獎得主
