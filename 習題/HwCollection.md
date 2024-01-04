@@ -320,6 +320,8 @@ gradDescendent(f, [0.0, 0.0, 0.0])
 1989年3月12日提出了資訊管理系統，並於11月中旬透過網際網路實現了超文本傳輸協定（HTTP）用戶端和伺服器之間的首次成功通信。1990年他在瑞士CERN的工作期間編寫了第一個網頁瀏覽器。網頁瀏覽器於1991年1月向其他研究機構發行，並於同年8月向大眾開放。他設計並實現了第一個網頁瀏覽器和Web伺服器，並幫助促進了Web隨後的爆炸性發展。他是全球資訊網協會(W3C)的創始人和董事。
 
 ## 參考
+> **困難與挑戰**使用ChatGPT，其餘資訊來自下方連結 
+
 [Tim_Berners-Lee - wiki](https://en.wikipedia.org/wiki/Tim_Berners-Lee)
 
 [W3C - wiki](https://en.wikipedia.org/wiki/World_Wide_Web_Consortium)
