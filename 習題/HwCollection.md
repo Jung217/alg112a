@@ -309,7 +309,45 @@ PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題6> python .\grad.py
 00693:f(p)=0.000 p=[4.99499585 0.99499917 2.99499751] gp=[-8.30301730e-06 -1.65395440e-06 -4.97848585e-06] glen=0.00001
 ```
 ### 習題七
+> 根據習題六的程式，改用 micrograd 的反傳遞算法算梯度
 
+```py
+#參考:https://github.com/ccc-py/micrograd/?tab=readme-ov-file#example-usage
+
+from micrograd.engine import Value
+
+a = Value(2.0)
+b = Value(1.0)
+c = Value(3.0)
+
+for i in range(100000):
+    step = 0.01
+    f = a**2 + b**2 + c**2
+
+    print('f(p) = {}, p = [{}, {}, {}]'.format(f.data, a.data, b.data, c.data))
+
+    f.backward()
+    if(a.grad < 0.001): break
+    
+    a -= a.grad * step
+    b -= b.grad * step
+    c -= c.grad * step
+    
+print('\nf(p) = {}, p = [{}, {}, {}]'.format(f.data, a.data, b.data, c.data))
+```
+[result.txt](https://github.com/Jung217/alg112a/blob/master/%E7%BF%92%E9%A1%8C/%E7%BF%92%E9%A1%8C6/result.txt)
+```
+PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題7> python .\micro.py
+f(p) = 14.0, p = [2.0, 1.0, 3.0]
+f(p) = 13.445599999999999, p = [1.96, 0.98, 2.94]
+f(p) = 12.91315424, p = [1.9208, 0.9604, 2.8811999999999998]
+......
+f(p) = 9.31232130542771e-07, p = [0.0005158161717242102, 0.0002579080858621051, 0.0007737242575863163]
+f(p) = 8.943553381732774e-07, p = [0.000505499848289726, 0.000252749924144863, 0.0007582497724345899]
+f(p) = 8.589388667816155e-07, p = [0.0004953898513239314, 0.0002476949256619657, 0.0007430847769858981]
+
+f(p) = 8.589388667816155e-07, p = [0.0004953898513239314, 0.0002476949256619657, 0.0007430847769858981]
+```
 ### 習題八
 > 請選一位圖靈獎得主，詳細說明他的得獎原因
 
