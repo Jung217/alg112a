@@ -335,7 +335,7 @@ for i in range(100000):
     
 print('\nf(p) = {}, p = [{}, {}, {}]'.format(f.data, a.data, b.data, c.data))
 ```
-[result.txt](https://github.com/Jung217/alg112a/blob/master/%E7%BF%92%E9%A1%8C/%E7%BF%92%E9%A1%8C6/result.txt)
+[result.txt](https://github.com/Jung217/alg112a/blob/master/%E7%BF%92%E9%A1%8C/%E7%BF%92%E9%A1%8C7/result.txt)
 ```
 PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題7> python .\micro.py
 f(p) = 14.0, p = [2.0, 1.0, 3.0]
