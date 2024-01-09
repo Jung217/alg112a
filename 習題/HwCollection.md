@@ -482,7 +482,7 @@ def f(x):
 
 print('\n', hillClimbing(f, [0.0]))
 ```
-[result.txt](https://github.com/Jung217/alg112a/blob/master/%E7%BF%92%E9%A1%8C/%E7%BF%92%E9%A1%8C7/result.txt)
+[result.txt](https://github.com/Jung217/alg112a/blob/master/%E7%BF%92%E9%A1%8C/%E7%BF%92%E9%A1%8C10/result.txt)
 ```
 PS C:\Users\alex2\Desktop\NQU\alg112a\習題\習題10> python .\Npoly.py
 p= [-0.0038678122680304346] f(p)= 0.9999999999991344
