@@ -1,0 +1,5 @@
+C:\Users\alex2\Desktop\NQU\alg112a\material\Ray tracing\ray.py:158: RuntimeWarning: divide by zero encountered in scalar divide
+  t.append((point[i] - ray.start_point[i])/ray.direction[i])
+Image saved as raytray_image.png
+Display: 800 x 450
+Time to compute: 1291.451231956482 s
