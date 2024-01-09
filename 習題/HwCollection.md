@@ -453,6 +453,7 @@ success!
 > 寫一個程式可以求解 n 次多項式
 
 ```py
+# 改自習題五，if判斷參考:https://github.com/LeeYi-user/alg112a/blob/master/homework/10/homework.py
 import random
 
 def hillClimbing(f, init, h=0.01):
@@ -465,7 +466,7 @@ def hillClimbing(f, init, h=0.01):
         for i in range(len(neighbor)): neighbor[i] += random.uniform(-h, h)
         f1 = f(neighbor)
 
-        if f1 < fnow:
+        if f1 < fnow: # 參考
             if f1 <= 0 : break
             fnow = f1
             p = neighbor.copy()
