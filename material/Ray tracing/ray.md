@@ -1,4 +1,4 @@
-![image](https://github.com/Jung217/alg112a/assets/99934895/4a3c2370-64ff-4914-ab16-53c50af3cffc)# 在 Python 中從 0 開始進行 *光線追踪*
+# 在 Python 中從 0 開始進行 *光線追踪*
 
 > 全篇整理自 [Omar Aflak-Ray Tracing From Scratch in Python](https://omaraflak.medium.com/ray-tracing-from-scratch-in-python-41670e6a96f9)
 > 
