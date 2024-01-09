@@ -225,5 +225,264 @@ if nearest_object:
 light = { 'position': np.array([5, 5, 5]) }
 ```
 要檢查物體是否遮擋交點，必須傳遞從交點開始並向光源發出的光線，查看返回的最近物體是否實際上比光源更接近交點（介於兩者之間）。
+(如果使用交點作為新光線的原點，最終可能會偵測到目前所在球體作為交點和光線之間的物件。解決問題的一個快速且廣泛使用的解決方案是採取一小步，讓我們遠離球體表面。通常使用表面的法線向量並朝該方向邁出一小步。(適用於任何物體))
 
+![image](https://github.com/Jung217/alg112a/assets/99934895/3e0105f7-5ac8-4988-a2b0-16c48996511f)
+
+```py
+# ...
+intersection = origin + min_distance * direction
+
+normal_to_surface = normalize(intersection - nearest_object['center'])
+shifted_point = intersection + 1e-5 * normal_to_surface
+intersection_to_light = normalize(light['position'] - shifted_point)
+
+_, min_distance = nearest_intersected_object(objects, shifted_point, intersection_to_light)
+intersection_to_light_distance = np.linalg.norm(light['position'] - intersection)
+is_shadowed = min_distance < intersection_to_light_distance
+
+if is_shadowed:
+    continue
+```
+
+## Blinn-Phong 反射模型
+我們知道光束照射到物體上，光束的反射直接進入相機。但相機看到了什麼？這就是 Blinn-Phong 模型解決的問題。
+
+Blinn-Phong 模型是計算強度較小的 [Phong 模型](https://en.wikipedia.org/wiki/Phong_reflection_model)
+
+在模型中，所有物體具備以下四個屬性 (所有顏色都是0–1範圍內的RGB表示形式) :
+* 環境顏色 (Ambient color) : 物體在沒有光的情況下應該有的顏色
+* 漫反射顏色 (Diffuse color) : 最接近平常所說的「顏色」的顏色
+* 鏡面顏色 (Specular color) : 線照射到物體上時，物體發光部分的顏色 (大多是白色)
+* 閃亮系數 (Shininess) : 表示物體光澤程度的係數
+
+![image](https://github.com/Jung217/alg112a/assets/99934895/975e539b-a01f-45ab-983f-e6b523229aec)
+```py
+objects = [
+    { 'center': np.array([-0.2, 0, -1]), 'radius': 0.7, 'ambient': np.array([0.1, 0, 0]), 'diffuse': np.array([0.7, 0, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100 },
+    { 'center': np.array([0.1, -0.3, 0]), 'radius': 0.1, 'ambient': np.array([0.1, 0, 0.1]), 'diffuse': np.array([0.7, 0, 0.7]), 'specular': np.array([1, 1, 1]), 'shininess': 100 },
+    { 'center': np.array([-0.3, 0, 0]), 'radius': 0.15, 'ambient': np.array([0, 0.1, 0]), 'diffuse': np.array([0, 0.6, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100 }
+]
+```
+在 Blinn-Phong 模型中，**光**還具有三種屬性：環境光、漫反射和鏡面反射。
+```py
+light = { 'position': np.array([5, 5, 5]), 'ambient': np.array([1, 1, 1]), 'diffuse': np.array([1, 1, 1]), 'specular': np.array([1, 1, 1]) }
+```
+Blinn-Phong 模型計算點的光照如下：
+
+![image](https://github.com/Jung217/alg112a/assets/99934895/970d57ee-74b9-4665-aa58-4d968387b144)
+
+* ka, kd, ks 是物體的環境光、漫反射、鏡面反射屬性
+* ia, id, is 是光的環境光、漫反射、鏡面反射屬性
+* L 是從交點到光方向的單位向量
+* N 是交點處物體表面的單位法向量
+* V 是從交點到相機方向的單位向量
+* α 是物體的光澤度
+
+```py
+# ...
+if is_shadowed:
+    break
+
+# RGB
+illumination = np.zeros((3))
+
+# 環境
+illumination += nearest_object['ambient'] * light['ambient']
+
+# 漫反射
+illumination += nearest_object['diffuse'] * light['diffuse'] * np.dot(intersection_to_light, normal_to_surface)
+
+# 鏡面
+intersection_to_camera = normalize(camera - intersection)
+H = normalize(intersection_to_light + intersection_to_camera)
+illumination += nearest_object['specular'] * light['specular'] * np.dot(normal_to_surface, H) ** (nearest_object['shininess'] / 4)
+
+image[i, j] = np.clip(illumination, 0, 1)
+```
+
+## RUN THE CODE !!
+增加寬度和高度以得到更高的解析度（解析度越高，時間越久）。
+
+![image](https://github.com/Jung217/alg112a/assets/99934895/02855d96-0487-4df2-9ade-5a7b953a62ce)
+
+與第一張圖比，**少了灰色地板**，**且無反射效果**
+
+## 假平面
+理想情況下，我們會創建另平面，但也可以簡單地使用另一個球體。如果你站在一個半徑無限大（與你的尺寸相比）的球體上，那麼你會感覺就像站在平坦的表面上。就像地球一樣。
+```py
+{ 'center': np.array([0, -9000, 0]), 'radius': 9000 - 0.7, 'ambient': np.array([0.1, 0.1, 0.1]), 'diffuse': np.array([0.6, 0.6, 0.6]), 'specular': np.array([1, 1, 1]), 'shininess': 100 }
+```
+
+## 反射
+目前 : 從光源發出，撞擊物體的表面，然後直接彈向相機。
+
+如果光線在撞擊相機之前撞擊了多個物體怎麼辦？ >>> **光線會累積不同的顏色，當它回到相機時，就會看到反射**。
+
+每個物體的反射係數在 0–1 範圍內。「0」表示物體無光澤，「1」表示物體像鏡子。
+```py
+{ 'center': np.array([-0.2, 0, -1]), ..., 'reflection': 0.5 } 
+{ 'center': np.array([0.1, -0.3, 0]), . .., 'reflection': 0.5 } 
+{ 'center': np.array([-0.3, 0, 0]), ..., 'reflection': 0.5 } 
+{ 'center': np.array([0, -9000, 0]), ..., 'reflection': 0.5 }
+```
+### 演算法
+目前 : 計算一條從相機開始並向像素移動的光線，然後將光線追蹤到場景中，檢查最近的交點併計算交點顏色。
+
+為了包含反射，需要在相交發生後追蹤反射光線並包含每個相交點的顏色貢獻。重複該過程特定次數
+### 顏色計算
+為了得到像素的顏色，我們需要將光線對每個相交點的貢獻求和。
+
+![image](https://github.com/Jung217/alg112a/assets/99934895/2391ec70-675f-4a49-8d76-4f5b11d625cf)
+* c 是像素的（最終）顏色
+* i 是 #index 交點的 Blinn-Phong 模型計算的光照
+* r 是 #index 相交對象的反射
+
+自行決定何時停止計算總和（停止追蹤反射光線）
+### 反射光線
+在對此進行寫程式前，需要找到反射光線的方向。可以透過以下方式計​​算反射的光線：
+
+![image](https://github.com/Jung217/alg112a/assets/99934895/883a2f8d-5723-48a2-b905-257c4c81b687)
+![image](https://github.com/Jung217/alg112a/assets/99934895/32125564-2690-4fb7-a856-a9e98c443dd1)
+* R 是正歸化的反射光線
+* V 為被反射光線方向的單位向量
+* N 是射線筆畫表面法向的單位向量
+
+將此方法與函數一起添加到程式上方的 `normalize()`
+```py
+def reflected(vector, axis):
+    return vector - 2 * np.dot(vector, axis) * axis
+```
+</br>
+
+> 這是最後的一個小改變。只需進行以下更改：
+```py
+# 全域變數以及圖像寬高等相關參數
+max_depth = 3
+
+# 迴圈開始，迭代每個像素
+for k in range(max_depth):
+    # 找到最近的物體和距離
+    nearest_object, min_distance = find_nearest_object(origin, direction)
+
+    # 計算光照
+    illumination = calculate_illumination(nearest_object, origin, direction)
+
+    # 反射部分
+    color += reflection * illumination
+    reflection *= nearest_object['reflection']
+
+    # 計算新的射線起點和方向
+    origin = shifted_point
+    direction = reflected(direction, normal_to_surface)
+
+# 設置像素的顏色，並進行範圍限制
+image[i, j] = np.clip(color, 0, 1)
+```
+
+## 最終的程式 & 結果
+![image](https://github.com/Jung217/alg112a/assets/99934895/d6303e82-9416-4f4b-8769-63745e2e9b1a)
+```py
+import numpy as np
+import matplotlib.pyplot as plt
+
+def normalize(vector):
+    return vector / np.linalg.norm(vector)
+
+def reflected(vector, axis):
+    return vector - 2 * np.dot(vector, axis) * axis
+
+def sphere_intersect(center, radius, ray_origin, ray_direction):
+    b = 2 * np.dot(ray_direction, ray_origin - center)
+    c = np.linalg.norm(ray_origin - center) ** 2 - radius ** 2
+    delta = b ** 2 - 4 * c
+    if delta > 0:
+        t1 = (-b + np.sqrt(delta)) / 2
+        t2 = (-b - np.sqrt(delta)) / 2
+        if t1 > 0 and t2 > 0:
+            return min(t1, t2)
+    return None
+
+def nearest_intersected_object(objects, ray_origin, ray_direction):
+    distances = [sphere_intersect(obj['center'], obj['radius'], ray_origin, ray_direction) for obj in objects]
+    nearest_object = None
+    min_distance = np.inf
+    for index, distance in enumerate(distances):
+        if distance and distance < min_distance:
+            min_distance = distance
+            nearest_object = objects[index]
+    return nearest_object, min_distance
+
+width = 300
+height = 200
+
+max_depth = 3
+
+camera = np.array([0, 0, 1])
+ratio = float(width) / height
+screen = (-1, 1 / ratio, 1, -1 / ratio) # left, top, right, bottom
+
+light = { 'position': np.array([5, 5, 5]), 'ambient': np.array([1, 1, 1]), 'diffuse': np.array([1, 1, 1]), 'specular': np.array([1, 1, 1]) }
+
+objects = [
+    { 'center': np.array([-0.2, 0, -1]), 'radius': 0.7, 'ambient': np.array([0.1, 0, 0]), 'diffuse': np.array([0.7, 0, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 },
+    { 'center': np.array([0.1, -0.3, 0]), 'radius': 0.1, 'ambient': np.array([0.1, 0, 0.1]), 'diffuse': np.array([0.7, 0, 0.7]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 },
+    { 'center': np.array([-0.3, 0, 0]), 'radius': 0.15, 'ambient': np.array([0, 0.1, 0]), 'diffuse': np.array([0, 0.6, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 },
+    { 'center': np.array([0, -9000, 0]), 'radius': 9000 - 0.7, 'ambient': np.array([0.1, 0.1, 0.1]), 'diffuse': np.array([0.6, 0.6, 0.6]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 }
+]
+
+image = np.zeros((height, width, 3))
+for i, y in enumerate(np.linspace(screen[1], screen[3], height)):
+    for j, x in enumerate(np.linspace(screen[0], screen[2], width)):
+        # screen is on origin
+        pixel = np.array([x, y, 0])
+        origin = camera
+        direction = normalize(pixel - origin)
+
+        color = np.zeros((3))
+        reflection = 1
+
+        for k in range(max_depth):
+            # check for intersections
+            nearest_object, min_distance = nearest_intersected_object(objects, origin, direction)
+            if nearest_object is None:
+                break
+
+            intersection = origin + min_distance * direction
+            normal_to_surface = normalize(intersection - nearest_object['center'])
+            shifted_point = intersection + 1e-5 * normal_to_surface
+            intersection_to_light = normalize(light['position'] - shifted_point)
+
+            _, min_distance = nearest_intersected_object(objects, shifted_point, intersection_to_light)
+            intersection_to_light_distance = np.linalg.norm(light['position'] - intersection)
+            is_shadowed = min_distance < intersection_to_light_distance
+
+            if is_shadowed:
+                break
+
+            illumination = np.zeros((3))
+
+            # ambiant
+            illumination += nearest_object['ambient'] * light['ambient']
+
+            # diffuse
+            illumination += nearest_object['diffuse'] * light['diffuse'] * np.dot(intersection_to_light, normal_to_surface)
+
+            # specular
+            intersection_to_camera = normalize(camera - intersection)
+            H = normalize(intersection_to_light + intersection_to_camera)
+            illumination += nearest_object['specular'] * light['specular'] * np.dot(normal_to_surface, H) ** (nearest_object['shininess'] / 4)
+
+            # reflection
+            color += reflection * illumination
+            reflection *= nearest_object['reflection']
+
+            origin = shifted_point
+            direction = reflected(direction, normal_to_surface)
+
+        image[i, j] = np.clip(color, 0, 1)
+    print("%d/%d" % (i + 1, height))
+
+plt.imsave('image.png', image)
+```
 
