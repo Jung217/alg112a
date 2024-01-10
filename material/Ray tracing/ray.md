@@ -386,16 +386,22 @@ image[i, j] = np.clip(color, 0, 1)
 import numpy as np
 import matplotlib.pyplot as plt
 
+# 函數：將向量歸一化
 def normalize(vector):
     return vector / np.linalg.norm(vector)
 
+# 函數：計算反射向量
 def reflected(vector, axis):
     return vector - 2 * np.dot(vector, axis) * axis
 
+# 函數：球體相交測試
 def sphere_intersect(center, radius, ray_origin, ray_direction):
+    # 球體相交方程
     b = 2 * np.dot(ray_direction, ray_origin - center)
     c = np.linalg.norm(ray_origin - center) ** 2 - radius ** 2
     delta = b ** 2 - 4 * c
+
+    # 檢查相交點
     if delta > 0:
         t1 = (-b + np.sqrt(delta)) / 2
         t2 = (-b - np.sqrt(delta)) / 2
@@ -403,6 +409,7 @@ def sphere_intersect(center, radius, ray_origin, ray_direction):
             return min(t1, t2)
     return None
 
+# 函數：找到最近的相交物體
 def nearest_intersected_object(objects, ray_origin, ray_direction):
     distances = [sphere_intersect(obj['center'], obj['radius'], ray_origin, ray_direction) for obj in objects]
     nearest_object = None
@@ -413,6 +420,7 @@ def nearest_intersected_object(objects, ray_origin, ray_direction):
             nearest_object = objects[index]
     return nearest_object, min_distance
 
+# 設置相機和畫面大小等相關參數
 width = 300
 height = 200
 
@@ -420,21 +428,31 @@ max_depth = 3
 
 camera = np.array([0, 0, 1])
 ratio = float(width) / height
-screen = (-1, 1 / ratio, 1, -1 / ratio) # left, top, right, bottom
+screen = (-1, 1 / ratio, 1, -1 / ratio)  # left, top, right, bottom
 
-light = { 'position': np.array([5, 5, 5]), 'ambient': np.array([1, 1, 1]), 'diffuse': np.array([1, 1, 1]), 'specular': np.array([1, 1, 1]) }
+# 光源參數
+light = {'position': np.array([5, 5, 5]), 'ambient': np.array([1, 1, 1]),
+         'diffuse': np.array([1, 1, 1]), 'specular': np.array([1, 1, 1])}
 
+# 物體列表
 objects = [
-    { 'center': np.array([-0.2, 0, -1]), 'radius': 0.7, 'ambient': np.array([0.1, 0, 0]), 'diffuse': np.array([0.7, 0, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 },
-    { 'center': np.array([0.1, -0.3, 0]), 'radius': 0.1, 'ambient': np.array([0.1, 0, 0.1]), 'diffuse': np.array([0.7, 0, 0.7]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 },
-    { 'center': np.array([-0.3, 0, 0]), 'radius': 0.15, 'ambient': np.array([0, 0.1, 0]), 'diffuse': np.array([0, 0.6, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 },
-    { 'center': np.array([0, -9000, 0]), 'radius': 9000 - 0.7, 'ambient': np.array([0.1, 0.1, 0.1]), 'diffuse': np.array([0.6, 0.6, 0.6]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5 }
+    {'center': np.array([-0.2, 0, -1]), 'radius': 0.7, 'ambient': np.array([0.1, 0, 0]),
+     'diffuse': np.array([0.7, 0, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5},
+    {'center': np.array([0.1, -0.3, 0]), 'radius': 0.1, 'ambient': np.array([0.1, 0, 0.1]),
+     'diffuse': np.array([0.7, 0, 0.7]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5},
+    {'center': np.array([-0.3, 0, 0]), 'radius': 0.15, 'ambient': np.array([0, 0.1, 0]),
+     'diffuse': np.array([0, 0.6, 0]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5},
+    {'center': np.array([0, -9000, 0]), 'radius': 9000 - 0.7, 'ambient': np.array([0.1, 0.1, 0.1]),
+     'diffuse': np.array([0.6, 0.6, 0.6]), 'specular': np.array([1, 1, 1]), 'shininess': 100, 'reflection': 0.5}
 ]
 
+# 生成空白畫布
 image = np.zeros((height, width, 3))
+
+# 迭代每個像素
 for i, y in enumerate(np.linspace(screen[1], screen[3], height)):
     for j, x in enumerate(np.linspace(screen[0], screen[2], width)):
-        # screen is on origin
+        # 創建像素光線
         pixel = np.array([x, y, 0])
         origin = camera
         direction = normalize(pixel - origin)
@@ -442,8 +460,9 @@ for i, y in enumerate(np.linspace(screen[1], screen[3], height)):
         color = np.zeros((3))
         reflection = 1
 
+        # 迭代光線
         for k in range(max_depth):
-            # check for intersections
+            # 檢查相交物體
             nearest_object, min_distance = nearest_intersected_object(objects, origin, direction)
             if nearest_object is None:
                 break
@@ -462,27 +481,30 @@ for i, y in enumerate(np.linspace(screen[1], screen[3], height)):
 
             illumination = np.zeros((3))
 
-            # ambiant
+            # 環境光
             illumination += nearest_object['ambient'] * light['ambient']
 
-            # diffuse
+            # 漫反射
             illumination += nearest_object['diffuse'] * light['diffuse'] * np.dot(intersection_to_light, normal_to_surface)
 
-            # specular
+            # 鏡面反射
             intersection_to_camera = normalize(camera - intersection)
             H = normalize(intersection_to_light + intersection_to_camera)
-            illumination += nearest_object['specular'] * light['specular'] * np.dot(normal_to_surface, H) ** (nearest_object['shininess'] / 4)
+            illumination += nearest_object['specular'] * light['specular'] * np.dot(normal_to_surface, H) ** (
+                        nearest_object['shininess'] / 4)
 
-            # reflection
+            # 反射
             color += reflection * illumination
             reflection *= nearest_object['reflection']
 
             origin = shifted_point
             direction = reflected(direction, normal_to_surface)
 
+        # 將顏色值應用於畫素，並進行範圍限制
         image[i, j] = np.clip(color, 0, 1)
     print("%d/%d" % (i + 1, height))
 
+# 保存生成的圖像
 plt.imsave('image.png', image)
 ```
 
